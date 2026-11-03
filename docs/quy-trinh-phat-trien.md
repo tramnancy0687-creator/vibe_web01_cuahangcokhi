@@ -5,11 +5,12 @@ Mục tiêu: code đúng đặc tả, đúng kiến trúc, và **tài liệu lu�
 
 | Tài liệu | Nội dung | Khi nào đọc / sửa |
 |---|---|---|
-| [phan-tich-usecase.md](phan-tich-usecase.md) | Use case, luồng, quy tắc, câu hỏi còn mở | Đọc trước khi làm; sửa khi đặc tả thay đổi hoặc chốt được câu hỏi mở |
-| [usecase_cuahang_cokhi.puml](usecase_cuahang_cokhi.puml) | Sơ đồ use case | Sửa khi thêm hoặc bớt use case, tác nhân |
-| [wireframe.html](wireframe.html) | Bố cục màn hình | Xem khi làm giao diện |
-| [kien-truc.md](kien-truc.md) | Công nghệ, phân tầng, dữ liệu, phân quyền, triển khai | **Đọc trước khi code, cập nhật sau khi code** (mục 3) |
-| [thiet-ke-csdl.md](thiet-ke-csdl.md) | Chi tiết từng bảng, cột, quan hệ, bất biến, thao tác ghi theo use case | Cập nhật khi đổi `schema.ts` hoặc đổi bảng mà một hàm nghiệp vụ ghi vào (mục 3) |
+| [usecase/phan-tich-usecase.md](usecase/phan-tich-usecase.md) | Use case, luồng, quy tắc, câu hỏi còn mở | Đọc trước khi làm; sửa khi đặc tả thay đổi hoặc chốt được câu hỏi mở |
+| [usecase/usecase_cuahang_cokhi.puml](usecase/usecase_cuahang_cokhi.puml) | Sơ đồ use case | Sửa khi thêm hoặc bớt use case, tác nhân |
+| [kien-truc/wireframe.html](kien-truc/wireframe.html) | Bố cục màn hình | Xem khi làm giao diện |
+| [kien-truc/kien-truc.md](kien-truc/kien-truc.md) | Công nghệ, phân tầng, dữ liệu, phân quyền, triển khai | **Đọc trước khi code, cập nhật sau khi code** (mục 3) |
+| [kien-truc/kien-truc.puml](kien-truc/kien-truc.puml) | Sơ đồ thành phần (PlantUML) | Sửa khi thêm tầng, thành phần, dịch vụ ngoài |
+| [kien-truc/thiet-ke-csdl.md](kien-truc/thiet-ke-csdl.md) | Chi tiết từng bảng, cột, quan hệ, bất biến, thao tác ghi theo use case | Cập nhật khi đổi `schema.ts` hoặc đổi bảng mà một hàm nghiệp vụ ghi vào (mục 3) |
 | [huong-dan-su-dung.md](huong-dan-su-dung.md) | Hướng dẫn thao tác cho chủ, nhân viên bán hàng, thủ kho | Cập nhật khi thêm hoặc đổi màn hình, nút, quy tắc người dùng thấy (mục 3) |
 | `quy-trinh-phat-trien.md` | Tài liệu này | — |
 

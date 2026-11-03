@@ -1,7 +1,7 @@
 # Thành Phát · Website quản lý cửa hàng cơ khí
 
 Next.js 16 (App Router) + SQLite (`node:sqlite` có sẵn trong Node, không cần cài thêm driver).
-Đặc tả: [../docs/phan-tich-usecase.md](../docs/phan-tich-usecase.md) · Sơ đồ: [../docs/usecase_cuahang_cokhi.puml](../docs/usecase_cuahang_cokhi.puml) · Wireframe: [../docs/wireframe.html](../docs/wireframe.html)
+Đặc tả: [../docs/usecase/phan-tich-usecase.md](../docs/usecase/phan-tich-usecase.md) · Sơ đồ: [../docs/usecase/usecase_cuahang_cokhi.puml](../docs/usecase/usecase_cuahang_cokhi.puml) · Kiến trúc: [../docs/kien-truc/](../docs/kien-truc/kien-truc.md) · Wireframe: [../docs/kien-truc/wireframe.html](../docs/kien-truc/wireframe.html)
 
 ## Chạy dự án
 

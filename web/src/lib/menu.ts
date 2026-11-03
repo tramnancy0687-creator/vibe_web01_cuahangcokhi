@@ -2,7 +2,7 @@ import type { Role } from "./auth";
 
 export type MenuItem = { href: string; label: string; roles: Role[]; group: string };
 
-// Quyền theo vai trò, khớp bảng phân quyền trong docs/wireframe.html
+// Quyền theo vai trò, khớp bảng phân quyền trong docs/kien-truc/wireframe.html
 export const MENU: MenuItem[] = [
   { href: "/", label: "Trang chủ", roles: ["CH", "NV", "TK"], group: "" },
   { href: "/ban-hang", label: "Bán hàng", roles: ["CH", "NV"], group: "Bán hàng" },

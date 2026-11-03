@@ -1,6 +1,6 @@
 # Thiết kế cơ sở dữ liệu — Website quản lý cửa hàng Thành Phát
 
-Mô tả chi tiết CSDL SQLite của dự án. Nguồn chuẩn là [`web/src/lib/schema.ts`](../web/src/lib/schema.ts). Khi hai bên khác nhau thì code đúng, và phải sửa tài liệu này.
+Mô tả chi tiết CSDL SQLite của dự án. Nguồn chuẩn là [`web/src/lib/schema.ts`](../../web/src/lib/schema.ts). Khi hai bên khác nhau thì code đúng, và phải sửa tài liệu này.
 Bối cảnh kiến trúc xem [kien-truc.md](kien-truc.md), mục 2.4 và 4.
 
 ---

@@ -1,0 +1,68 @@
+@startuml kien-truc
+' Sơ đồ kiến trúc thành phần — Website quản lý cửa hàng cơ khí Thành Phát
+' Chi tiết: kien-truc.md
+skinparam packageStyle rectangle
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor White
+  BorderColor Black
+  ArrowColor #444444
+}
+
+actor "Chủ cửa hàng" as CH
+actor "Nhân viên bán hàng" as NV
+actor "Thủ kho" as TK
+
+node "Trình duyệt" as BR {
+  component "Trang HTML\n(render ở server)" as HTML
+  component "Client component\nPosForm, ImportForm, LoginForm" as CC
+}
+
+node "Máy chủ Node.js (Render)" as SV {
+  package "Tầng giao diện — app/(app)/<màn hình>/page.tsx" as UI {
+    component "layout.tsx\nrequireUser + menu theo vai trò" as LAY
+    component "11 màn hình\nbán hàng, trả hàng, công nợ,\nnhập hàng, kiểm kê, danh mục,\ntài khoản, báo cáo" as PAGES
+  }
+  package "Tầng điều khiển — actions.ts (server action)" as CTL {
+    component "requireUser(vai trò)\n→ đọc form\n→ gọi 1 hàm nghiệp vụ\n→ redirect ?ok / ?err" as ACT
+  }
+  package "Tầng nghiệp vụ — lib/" as BIZ {
+    component "auth.ts / menu.ts\nđăng nhập, phiên, phân quyền" as AUTH
+    component "sales.ts\nbán hàng, trả hàng" as SALES
+    component "inventory.ts\nlô FIFO, nhập hàng, kiểm kê" as INV
+    component "debt.ts\nsổ công nợ, thu nợ" as DEBT
+    component "catalog.ts\nhàng hóa, khách, NCC, tài khoản" as CAT
+    component "reports.ts\n6 báo cáo" as REP
+  }
+  package "Tầng dữ liệu — lib/db.ts" as DAL {
+    component "all / get / run\ntx (giao dịch)\nsetting(key), nextCode()" as DB
+  }
+}
+
+database "SQLite\ndata/cuahang.db\n17 bảng" as SQL
+
+CH --> BR
+NV --> BR
+TK --> BR
+
+HTML --> LAY : HTTP GET
+CC --> ACT : submit form (POST)
+LAY --> PAGES
+PAGES --> BIZ : đọc dữ liệu
+ACT --> BIZ : ghi dữ liệu
+SALES --> INV : consumeFIFO / addBatch
+SALES --> DEBT : ghi nợ, trừ nợ
+BIZ --> DB
+DB --> SQL : SQL có tham số ?
+
+note right of SQL
+  Không có cột "tồn kho":
+  tồn = SUM(batches.qty_left).
+  Công nợ = SUM(debt_entries.amount).
+end note
+
+note bottom of CTL
+  Quyền kiểm tra ở server
+  cho MỌI trang và MỌI action.
+end note
+@enduml

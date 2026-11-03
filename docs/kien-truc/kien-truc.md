@@ -1,8 +1,8 @@
 # Kiến trúc hệ thống — Website quản lý cửa hàng cơ khí Thành Phát
 
-Tài liệu mô tả cách website được xây dựng để hiện thực các use case trong [phan-tich-usecase.md](phan-tich-usecase.md).
-Mã nguồn: thư mục [`../web`](../web). Màn hình tham khảo: [wireframe.html](wireframe.html).
-Chi tiết CSDL: [thiet-ke-csdl.md](thiet-ke-csdl.md). Hướng dẫn cho người dùng: [huong-dan-su-dung.md](huong-dan-su-dung.md).
+Tài liệu mô tả cách website được xây dựng để hiện thực các use case trong [../usecase/phan-tich-usecase.md](../usecase/phan-tich-usecase.md).
+Mã nguồn: thư mục [`web/`](../../web). Màn hình tham khảo: [wireframe.html](wireframe.html). Sơ đồ thành phần: [kien-truc.puml](kien-truc.puml).
+Chi tiết CSDL: [thiet-ke-csdl.md](thiet-ke-csdl.md). Hướng dẫn cho người dùng: [../huong-dan-su-dung.md](../huong-dan-su-dung.md).
 
 ---
 

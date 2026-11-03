@@ -1,4 +1,4 @@
-# Cấu hình triển khai lên Render (Blueprint). Xem docs/kien-truc.md mục 7.
+# Cấu hình triển khai lên Render (Blueprint). Xem docs/kien-truc/kien-truc.md mục 7.
 services:
   - type: web
     name: vibe-web01-cuahangcokhi
