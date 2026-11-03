@@ -230,7 +230,8 @@ bt_usecase/
 
 ### Bản demo trên Render
 
-Cấu hình nằm ở file `render.yaml` ở thư mục gốc repo (Render Blueprint). Repo GitHub được nối với Render, và mỗi lần `git push` lên `main`, Render tự build và triển khai lại.
+Địa chỉ: **https://vibe-web01-cuahangcokhi.onrender.com**. Dịch vụ được tạo thủ công trên trang quản lý Render (Web Service `vibe_web01_cuahangcokhi`), nối với repo GitHub. Mỗi lần `git push` lên `main`, Render tự build và triển khai lại.
+File `render.yaml` ở thư mục gốc repo ghi lại đúng cấu hình đó dạng Blueprint, dùng khi cần tạo lại dịch vụ. Khi đổi cấu hình trên Render thì sửa cả file này cho khớp.
 
 | Mục | Giá trị |
 |---|---|
