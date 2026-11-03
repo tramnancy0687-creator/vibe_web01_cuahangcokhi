@@ -1,0 +1,99 @@
+@startuml usecase_cuahang_cokhi
+' Sơ đồ use case — Website quản lý cửa hàng đồ cơ khí Thành Phát
+skinparam packageStyle rectangle
+skinparam usecase {
+  BackgroundColor White
+  BorderColor Black
+  ArrowColor #444444
+}
+
+actor "Người dùng" as ND
+actor "Chủ cửa hàng" as CH
+actor "Nhân viên bán hàng" as NV
+actor "Thủ kho" as TK
+
+ND <|-- CH
+ND <|-- NV
+ND <|-- TK
+
+rectangle "Website quản lý cửa hàng cơ khí" {
+
+  usecase "Đăng nhập" as UC01
+
+  package "Danh mục" {
+    usecase "Quản lý hàng hóa\n& đơn vị tính" as UC02
+    usecase "Quản lý nhà cung cấp" as UC03
+    usecase "Quản lý khách hàng" as UC04
+    usecase "Quản lý tài khoản\nnhân viên" as UC05
+  }
+
+  package "Công nợ & trả hàng" {
+    usecase "Nhận hàng khách trả lại" as UC10
+    usecase "Trừ công nợ\nkhi trả hàng" as UC11
+    usecase "Thu nợ khách hàng" as UC12
+  }
+
+  package "Báo cáo" {
+    usecase "Xem báo cáo" as UC16
+    usecase "Công nợ khách hàng" as UC17
+    usecase "Lãi lỗ theo tháng" as UC18
+    usecase "Hàng tồn lâu\nkhông bán được" as UC19
+    usecase "Hàng sắp hết" as UC20
+    usecase "Chênh lệch kiểm kê" as UC21
+    usecase "Doanh số theo\nnhân viên" as UC22
+  }
+
+  package "Bán hàng" {
+    usecase "Tra cứu hàng hóa\n(tồn kho, giá bán)" as UC06
+    usecase "Lập phiếu bán hàng" as UC07
+    usecase "Ghi nợ cho khách\nmua chịu" as UC08
+  }
+
+  usecase "Quy đổi đơn vị tính\n(con / kg / mét)" as UC09
+
+  package "Kho" {
+    usecase "Lập phiếu nhập hàng\n(theo lô, giá nhập)" as UC13
+    usecase "Kiểm kê kho" as UC14
+    usecase "Ghi nhận chênh lệch\nkiểm kê" as UC15
+  }
+}
+
+' Người dùng
+ND --> UC01
+
+' Chủ cửa hàng
+CH --> UC02
+CH --> UC03
+CH --> UC04
+CH --> UC05
+CH --> UC12
+CH --> UC16
+
+' Nhân viên bán hàng
+NV --> UC06
+NV --> UC07
+NV --> UC10
+NV --> UC12
+
+' Thủ kho
+TK --> UC13
+TK --> UC14
+
+' Các loại báo cáo
+UC16 <|-- UC17
+UC16 <|-- UC18
+UC16 <|-- UC19
+UC16 <|-- UC20
+UC16 <|-- UC21
+UC16 <|-- UC22
+
+' include: luôn chạy kèm
+UC07 ..> UC09 : <<include>>
+UC13 ..> UC09 : <<include>>
+
+' extend: chỉ chạy khi có điều kiện
+UC08 ..> UC07 : <<extend>>
+UC11 ..> UC10 : <<extend>>
+UC15 ..> UC14 : <<extend>>
+
+@enduml

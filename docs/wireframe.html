@@ -1,0 +1,525 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wireframe Thành Phát</title>
+<style>
+/* Bố cục: danh sách màn hình bên trái, khung wireframe ở giữa, ghi chú bên dưới */
+:root {
+  --paper: #f4f4f1;
+  --ink: #23262a;
+  --muted: #6b7076;
+  --wf-line: #3a3d42;
+  --wf-fill: #e3e4e2;
+  --wf-soft: #f0f0ee;
+  --mark: #d9480f;
+  --ok: #2f7d4f;
+  --warn: #b7791f;
+  --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono: Consolas, "SF Mono", monospace;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 14px/1.5 var(--font); }
+button, input, select { font: inherit; color: inherit; }
+
+.doc-head { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; justify-content: space-between; padding: 16px max(16px, env(safe-area-inset-left)); border-bottom: 1px solid #d6d7d3; background: #fff; }
+.doc-head h1 { margin: 0; font-size: 18px; font-weight: 600; }
+.doc-head h1 span { color: var(--muted); font-weight: 400; }
+.roles { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
+.roles button { border: 1px solid #c9cac6; background: #fff; padding: 4px 12px; border-radius: 999px; cursor: pointer; }
+.roles button[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+.layout { display: grid; grid-template-columns: 240px minmax(0, 1fr); min-height: calc(100vh - 62px); }
+.screens { border-right: 1px solid #d6d7d3; padding: 16px; background: #fbfbf9; }
+.screens h3 { margin: 16px 0 6px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.screens h3:first-child { margin-top: 0; }
+.screens a { display: flex; justify-content: space-between; gap: 8px; padding: 5px 8px; border-radius: 4px; color: var(--ink); text-decoration: none; }
+.screens a:hover { background: #ecece8; }
+.screens a.active { background: var(--ink); color: #fff; }
+.screens a small { font-family: var(--mono); font-size: 11px; opacity: .65; white-space: nowrap; }
+.screens a.locked { color: #a5a8ab; }
+
+main { padding: 24px max(16px, env(safe-area-inset-right)) 48px 24px; display: grid; gap: 16px; align-content: start; min-width: 0; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: baseline; }
+.meta h2 { margin: 0; font-size: 22px; }
+.meta .uc { font-family: var(--mono); font-size: 12px; color: var(--mark); }
+.meta .who { font-size: 13px; color: var(--muted); }
+
+.stage { overflow-x: auto; padding-bottom: 4px; }
+.device { min-width: 960px; max-width: 1180px; border: 2px solid var(--wf-line); border-radius: 8px; background: #fff; overflow: hidden; }
+.device.bare { background: var(--wf-soft); }
+.browser { display: flex; gap: 6px; align-items: center; padding: 6px 10px; border-bottom: 1.5px solid var(--wf-line); background: var(--wf-fill); font-family: var(--mono); font-size: 11px; color: var(--muted); }
+.browser i { width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid var(--wf-line); }
+.browser span { margin-left: 10px; padding: 1px 10px; border: 1px solid #b9bbb8; border-radius: 4px; background: #fff; flex: 1; }
+.app { display: grid; grid-template-columns: 180px 1fr; min-height: 560px; }
+.topbar { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; border-bottom: 1.5px solid var(--wf-line); }
+.logo { display: flex; gap: 8px; align-items: center; font-weight: 700; }
+.logo i { width: 26px; height: 26px; border: 1.5px solid var(--wf-line); background: repeating-linear-gradient(45deg, var(--wf-fill) 0 4px, #fff 4px 8px); }
+.userbox { display: flex; gap: 12px; align-items: center; font-size: 13px; }
+.side { border-right: 1.5px solid var(--wf-line); padding: 12px 8px; display: grid; gap: 2px; align-content: start; background: var(--wf-soft); }
+.side a { padding: 6px 10px; border-radius: 4px; color: var(--ink); text-decoration: none; font-size: 13px; }
+.side a.active { background: var(--wf-line); color: #fff; }
+.content { padding: 16px; display: grid; gap: 14px; align-content: start; min-width: 0; }
+.denied { padding: 48px 16px; text-align: center; color: var(--muted); }
+
+/* Các khối wireframe */
+.row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.row.between { justify-content: space-between; }
+.cols { display: grid; gap: 14px; }
+.c2 { grid-template-columns: 1fr 1fr; }
+.c-73 { grid-template-columns: 1.15fr 1fr; }
+.c-37 { grid-template-columns: 300px 1fr; }
+.c4 { grid-template-columns: repeat(4, 1fr); }
+.panel { border: 1.5px solid var(--wf-line); border-radius: 6px; padding: 12px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.panel > h4 { margin: 0; font-size: 14px; }
+.h { font-weight: 600; font-size: 16px; }
+.sub { color: var(--muted); font-size: 12px; }
+.btn { display: inline-block; border: 1.5px solid var(--wf-line); border-radius: 4px; padding: 5px 12px; background: #fff; font-size: 13px; white-space: nowrap; }
+.btn.pri { background: var(--wf-line); color: #fff; }
+.btn.sm { padding: 1px 8px; font-size: 12px; }
+.inp { display: inline-flex; align-items: center; justify-content: space-between; gap: 8px; border: 1.5px solid #8b8e92; border-radius: 4px; padding: 5px 10px; min-width: 140px; color: var(--muted); background: #fff; font-size: 13px; }
+.inp.wide { flex: 1; min-width: 200px; }
+.inp.full { width: 100%; }
+.inp.sel::after { content: "▾"; }
+.inp.err { border-color: var(--mark); }
+.field { display: grid; gap: 4px; font-size: 12px; color: var(--muted); }
+.field .inp { color: var(--ink); }
+.radio { display: inline-flex; gap: 6px; align-items: center; font-size: 13px; }
+.radio i { width: 13px; height: 13px; border: 1.5px solid var(--wf-line); border-radius: 50%; }
+.radio i.on { background: radial-gradient(var(--wf-line) 0 3px, #fff 3.5px); }
+.check i { border-radius: 2px; }
+.check i.on { background: var(--wf-line); }
+.tabs { display: flex; gap: 0; border-bottom: 1.5px solid var(--wf-line); flex-wrap: wrap; }
+.tabs span { padding: 6px 14px; font-size: 13px; border: 1.5px solid transparent; border-bottom: 0; border-radius: 4px 4px 0 0; margin-bottom: -1.5px; cursor: pointer; }
+.tabs span.on { border-color: var(--wf-line); background: #fff; font-weight: 600; }
+table.t { width: 100%; border-collapse: collapse; font-size: 13px; }
+table.t th, table.t td { border: 1px solid #a9acaf; padding: 5px 8px; text-align: left; vertical-align: middle; }
+table.t th { background: var(--wf-fill); font-weight: 600; font-size: 12px; }
+table.t td.n, table.t th.n { text-align: right; font-variant-numeric: tabular-nums; }
+table.t tr.hl td { background: #fff3e6; }
+table.t tr.sel td { background: #e9eef5; }
+.tag { display: inline-block; padding: 0 8px; border: 1px solid currentColor; border-radius: 999px; font-size: 11px; }
+.tag.warn { color: var(--warn); }
+.tag.bad { color: var(--mark); }
+.tag.ok { color: var(--ok); }
+.stat { border: 1.5px solid var(--wf-line); border-radius: 6px; padding: 10px 12px; display: grid; gap: 2px; }
+.stat b { font-size: 20px; font-variant-numeric: tabular-nums; }
+.img { border: 1.5px solid var(--wf-line); background: linear-gradient(to top right, transparent calc(50% - 1px), #a9acaf, transparent calc(50% + 1px)), linear-gradient(to top left, transparent calc(50% - 1px), #a9acaf, transparent calc(50% + 1px)); min-height: 140px; display: grid; place-items: center; color: var(--muted); font-size: 12px; }
+.img span { background: #fff; padding: 0 6px; }
+.total { display: grid; grid-template-columns: 1fr auto; gap: 4px 16px; font-size: 13px; }
+.total b { text-align: right; font-variant-numeric: tabular-nums; }
+.total .big { font-size: 17px; }
+.hint { font-size: 12px; color: var(--muted); border-left: 3px solid #c9cac6; padding-left: 8px; }
+.error { color: var(--mark); font-size: 12px; }
+.login { display: grid; place-items: center; min-height: 560px; }
+.login .panel { width: 360px; background: #fff; padding: 24px; gap: 14px; }
+
+/* Đánh dấu ghi chú */
+.mk { display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: var(--mark); color: #fff; font: 600 11px var(--font); font-style: normal; vertical-align: middle; flex: none; }
+.notes { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; max-width: 900px; counter-reset: n; }
+.notes li { display: grid; grid-template-columns: 18px 1fr; gap: 10px; counter-increment: n; }
+.notes li::before { content: counter(n); display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: var(--mark); color: #fff; font-size: 11px; font-weight: 600; margin-top: 2px; }
+.notes b { font-weight: 600; }
+.notes code { font-family: var(--mono); font-size: 12px; color: var(--mark); }
+
+@media (max-width: 760px) {
+  .layout { grid-template-columns: 1fr; }
+  .screens { border-right: 0; border-bottom: 1px solid #d6d7d3; }
+  main { padding-left: max(16px, env(safe-area-inset-left)); }
+}
+</style>
+</head>
+<body>
+
+<header class="doc-head">
+  <h1>Wireframe <span>· Website quản lý cửa hàng cơ khí Thành Phát</span></h1>
+  <div class="roles" role="group" aria-label="Xem với vai trò">
+    Xem với vai trò:
+    <button type="button" data-role="CH" aria-pressed="true">Chủ cửa hàng</button>
+    <button type="button" data-role="NV" aria-pressed="false">NV bán hàng</button>
+    <button type="button" data-role="TK" aria-pressed="false">Thủ kho</button>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="screens" id="nav" aria-label="Danh sách màn hình"></nav>
+  <main>
+    <div class="meta"><h2 id="m-title"></h2><span class="uc" id="m-uc"></span><span class="who" id="m-who"></span></div>
+    <div class="stage"><div class="device" id="device"></div></div>
+    <ol class="notes" id="notes"></ol>
+  </main>
+</div>
+
+<!-- ============ MÀN HÌNH ============ -->
+
+<template id="s-login" data-title="Đăng nhập" data-uc="UC-01" data-roles="CH NV TK" data-group="Tài khoản" data-bare>
+  <div class="login">
+    <div class="panel">
+      <div class="logo" style="justify-content:center"><i></i>THÀNH PHÁT</div>
+      <div class="sub" style="text-align:center">Quản lý bán hàng · kho · công nợ</div>
+      <div class="field">Tên đăng nhập<span class="inp full">lan.nv</span></div>
+      <div class="field">Mật khẩu<span class="inp full err">••••••••</span></div>
+      <div class="error"><i class="mk">1</i> Sai tên đăng nhập hoặc mật khẩu.</div>
+      <span class="btn pri" style="text-align:center">Đăng nhập</span>
+      <div class="sub" style="text-align:center"><i class="mk">2</i> Quên mật khẩu? Liên hệ chủ cửa hàng.</div>
+    </div>
+  </div>
+  <ol class="notes">
+    <li>Báo lỗi chung, không nói rõ sai tên hay sai mật khẩu. Khóa tạm sau 5 lần sai liên tiếp.</li>
+    <li>Không có tự đăng ký hay tự lấy lại mật khẩu: chủ cửa hàng tạo và đặt lại mật khẩu ở màn hình <b>Tài khoản nhân viên</b>.</li>
+    <li>Đăng nhập xong chuyển về <b>Trang chủ</b>; menu bên trái chỉ hiện chức năng đúng vai trò (thử đổi vai trò ở góc trên).</li>
+  </ol>
+</template>
+
+<template id="s-home" data-title="Trang chủ" data-uc="UC-20 · UC-17" data-roles="CH NV TK" data-group="Chung">
+  <div class="row between"><div><div class="h">Xin chào</div><div class="sub">Thứ Hai, 02/11/2026</div></div>
+    <div class="row">
+      <span class="btn pri" data-roles="CH NV">+ Lập phiếu bán</span>
+      <span class="btn" data-roles="CH TK">+ Phiếu nhập</span>
+      <span class="btn" data-roles="CH TK">Kiểm kê</span>
+    </div>
+  </div>
+  <div class="cols c4">
+    <div class="stat" data-roles="CH"><span class="sub">Doanh thu hôm nay</span><b>14.820.000</b><span class="sub">38 phiếu</span></div>
+    <div class="stat" data-roles="NV"><span class="sub">Phiếu của tôi hôm nay</span><b>17</b><span class="sub">6.540.000 đ</span></div>
+    <div class="stat" data-roles="CH"><span class="sub">Công nợ phải thu</span><b>63.210.000</b><span class="sub">9 khách thầu</span></div>
+    <div class="stat"><span class="sub">Hàng sắp hết <i class="mk">1</i></span><b>5 món</b><span class="sub">dưới mức tối thiểu</span></div>
+    <div class="stat" data-roles="TK"><span class="sub">Phiếu nhập tháng này</span><b>12</b><span class="sub">4 nhà cung cấp</span></div>
+  </div>
+  <div class="cols c2">
+    <div class="panel"><h4>Hàng sắp hết</h4>
+      <table class="t"><tr><th>Món</th><th class="n">Tồn</th><th class="n">Tối thiểu</th></tr>
+        <tr><td>Ốc vít M8 x 30</td><td class="n">1,2 kg</td><td class="n">5 kg</td></tr>
+        <tr><td>Dây điện Cadivi 2.5</td><td class="n">40 m</td><td class="n">200 m</td></tr>
+        <tr><td>Que hàn 3.2 ly</td><td class="n">2 hộp</td><td class="n">10 hộp</td></tr>
+      </table>
+    </div>
+    <div class="panel" data-roles="CH"><h4>Nợ quá 30 ngày <i class="mk">2</i></h4>
+      <table class="t"><tr><th>Khách</th><th class="n">Còn nợ</th><th>Nợ từ</th></tr>
+        <tr><td>Anh Tư (thầu Q.7)</td><td class="n">18.450.000</td><td>03/09/2026</td></tr>
+        <tr><td>Cty XD Phú Lộc</td><td class="n">9.100.000</td><td>21/09/2026</td></tr>
+      </table>
+    </div>
+    <div class="panel" data-roles="NV TK"><h4>Lối tắt</h4><div class="sub">Tra cứu nhanh: gõ tên hoặc mã món</div><span class="inp full">🔍 vd. M8, cadivi…</span></div>
+  </div>
+  <ol class="notes">
+    <li>Cảnh báo hàng sắp hết lấy theo mức tồn tối thiểu khai báo trong <b>Hàng hóa</b> (UC-20). Bấm vào để xem báo cáo đầy đủ.</li>
+    <li>Chỉ chủ thấy doanh thu toàn cửa hàng và công nợ; nhân viên chỉ thấy số phiếu của chính mình.</li>
+    <li>Nút lối tắt thay đổi theo vai trò: NV bán thấy "Lập phiếu bán", thủ kho thấy "Phiếu nhập" và "Kiểm kê".</li>
+  </ol>
+</template>
+
+<template id="s-pos" data-title="Bán hàng" data-uc="UC-06 · UC-07 · UC-08 · UC-09" data-roles="CH NV" data-group="Bán hàng">
+  <div class="cols c-73">
+    <div class="panel"><h4>Tra cứu hàng hóa <i class="mk">1</i></h4>
+      <span class="inp full">🔍 ốc m8</span>
+      <table class="t">
+        <tr><th>Mã</th><th>Tên</th><th class="n">Tồn</th><th class="n">Giá lẻ</th><th class="n">Giá sỉ</th><th></th></tr>
+        <tr class="sel"><td>OV-M8-30</td><td>Ốc vít M8 x 30</td><td class="n">1,2 kg<br><span class="sub">≈ 192 con</span></td><td class="n">500 / con</td><td class="n">70.000 / kg</td><td><span class="btn sm">Thêm</span></td></tr>
+        <tr><td>OV-M8-50</td><td>Ốc vít M8 x 50</td><td class="n">6 kg</td><td class="n">700 / con</td><td class="n">72.000 / kg</td><td><span class="btn sm">Thêm</span></td></tr>
+        <tr><td>BL-M8</td><td>Bu lông M8 + tán</td><td class="n">0 con</td><td class="n">1.200 / con</td><td class="n">—</td><td><span class="tag bad">Hết</span></td></tr>
+      </table>
+      <div class="hint">Gõ tên, mã hoặc quét mã vạch. Hàng hết vẫn hiện để báo khách, nhưng không thêm vào phiếu được.</div>
+    </div>
+    <div class="panel"><div class="row between"><h4>Phiếu bán PB-2026-1102-018</h4><span class="sub">NV: Lan <i class="mk">5</i></span></div>
+      <div class="row"><span class="field" style="flex:1">Khách hàng <i class="mk">2</i><span class="inp sel full">Anh Tư (thầu Q.7) · đang nợ 18.450.000</span></span></div>
+      <table class="t">
+        <tr><th>Món</th><th class="n">SL</th><th>Đơn vị <i class="mk">3</i></th><th class="n">Thành tiền</th><th></th></tr>
+        <tr><td>Ốc vít M8 x 30</td><td class="n">1</td><td><span class="inp sel" style="min-width:70px">kg</span></td><td class="n">70.000</td><td>✕</td></tr>
+        <tr><td>Dây điện Cadivi 2.5</td><td class="n">25</td><td><span class="inp sel" style="min-width:70px">mét</span></td><td class="n">237.500</td><td>✕</td></tr>
+        <tr><td>Xi măng Hà Tiên</td><td class="n">10</td><td><span class="inp sel" style="min-width:70px">bao</span></td><td class="n">890.000</td><td>✕</td></tr>
+      </table>
+      <div class="hint">1 kg ốc M8 x 30 = 160 con → trừ kho 160 con.</div>
+      <div class="total"><span>Tổng tiền</span><b class="big">1.197.500</b></div>
+      <div class="row">Thanh toán <i class="mk">4</i>
+        <span class="radio"><i></i>Trả ngay</span>
+        <span class="radio"><i class="on"></i>Ghi nợ</span>
+      </div>
+      <div class="row between"><span class="btn">Hủy phiếu</span><span class="btn pri">Lưu & in phiếu</span></div>
+    </div>
+  </div>
+  <ol class="notes">
+    <li><b>UC-06</b> Tra cứu: tồn hiển thị theo đơn vị gốc kèm số quy đổi, giá lẻ và giá sỉ đặt cạnh nhau để báo giá ngay.</li>
+    <li>Mặc định là <b>Khách lẻ</b>. Chọn nhà thầu thì hiện số nợ hiện tại để nhân viên biết trước khi cho mua chịu.</li>
+    <li><b>UC-09</b> Mỗi dòng chọn đơn vị bán (con / kg, mét / cuộn); giá và số trừ kho tự quy đổi theo tỉ lệ trong danh mục hàng hóa.</li>
+    <li><b>UC-08</b> "Ghi nợ" chỉ bật khi khách là nhà thầu được mua chịu. Khách lẻ chỉ có "Trả ngay".</li>
+    <li>Nhân viên bán tự lấy từ tài khoản đăng nhập, không chọn tay, để báo cáo doanh số theo nhân viên đúng.</li>
+  </ol>
+</template>
+
+<template id="s-return" data-title="Nhận hàng trả lại" data-uc="UC-10 · UC-11" data-roles="CH NV" data-group="Công nợ & trả hàng">
+  <div class="row"><span class="inp wide">🔍 Số phiếu bán hoặc tên khách: PB-2026-1028-007</span><span class="btn">Tìm phiếu</span></div>
+  <div class="panel"><div class="row between"><h4>Phiếu PB-2026-1028-007 · 28/10/2026 · Anh Tư (thầu Q.7)</h4><span class="sub">NV bán: Hùng</span></div>
+    <table class="t">
+      <tr><th></th><th>Món</th><th class="n">Đã mua</th><th class="n">SL trả</th><th>Còn nguyên? <i class="mk">1</i></th><th class="n">Giá trị trả</th></tr>
+      <tr class="sel"><td><span class="radio check"><i class="on"></i></span></td><td>Thép hộp 40x80 dày 1.4</td><td class="n">12 cây</td><td class="n"><span class="inp" style="min-width:60px">3</span></td><td><span class="radio check"><i class="on"></i>Còn nguyên</span></td><td class="n">1.050.000</td></tr>
+      <tr><td><span class="radio check"><i></i></span></td><td>Sơn chống gỉ 3L</td><td class="n">4 lon</td><td class="n">—</td><td>—</td><td class="n">—</td></tr>
+    </table>
+    <div class="cols c2">
+      <div class="field">Lý do trả<span class="inp full">Công trình dư, khách đổi thiết kế</span></div>
+      <div class="panel" style="background:var(--wf-soft)"><h4>Hoàn lại cho khách <i class="mk">2</i></h4>
+        <div class="total"><span>Giá trị hàng trả</span><b>1.050.000</b><span>Trừ vào công nợ</span><b>− 1.050.000</b><span>Nợ còn lại</span><b>17.400.000</b></div>
+      </div>
+    </div>
+    <div class="row between"><span class="sub">Hàng trả được cộng lại vào tồn kho ngay khi xác nhận.</span><span class="btn pri">Xác nhận nhận hàng</span></div>
+  </div>
+  <ol class="notes">
+    <li>Bắt buộc tích "Còn nguyên" mới nhận được. Hàng hỏng không nhận (câu hỏi mở: có nhận giảm giá không?).</li>
+    <li><b>UC-11</b> Nếu khách đang có nợ: tự trừ vào công nợ. Khách lẻ hoặc khách không nợ: hiện "Hoàn tiền mặt".</li>
+    <li>Không cho trả quá số lượng đã mua trên phiếu gốc.</li>
+  </ol>
+</template>
+
+<template id="s-debt" data-title="Công nợ & thu nợ" data-uc="UC-12" data-roles="CH NV" data-group="Công nợ & trả hàng">
+  <div class="cols c-73">
+    <div class="panel"><div class="row between"><h4>Khách đang nợ</h4><span class="inp sel">Sắp xếp: nợ lâu nhất</span></div>
+      <table class="t">
+        <tr><th>Khách</th><th class="n">Còn nợ</th><th>Nợ từ</th><th></th></tr>
+        <tr class="sel"><td>Anh Tư (thầu Q.7)</td><td class="n">17.400.000</td><td>03/09/2026 <span class="tag bad">60 ngày</span></td><td><span class="btn sm">Thu nợ</span></td></tr>
+        <tr><td>Cty XD Phú Lộc</td><td class="n">9.100.000</td><td>21/09/2026 <span class="tag warn">42 ngày</span></td><td><span class="btn sm">Thu nợ</span></td></tr>
+        <tr><td>Chú Hai Mộc</td><td class="n">3.760.000</td><td>14/10/2026</td><td><span class="btn sm">Thu nợ</span></td></tr>
+      </table>
+    </div>
+    <div class="panel"><h4>Anh Tư · 0908 xxx 412</h4>
+      <table class="t">
+        <tr><th>Ngày</th><th>Chứng từ</th><th class="n">Phát sinh</th><th class="n">Còn nợ</th></tr>
+        <tr><td>03/09</td><td>PB-0903-004</td><td class="n">+ 6.200.000</td><td class="n">6.200.000</td></tr>
+        <tr><td>28/10</td><td>PB-1028-007</td><td class="n">+ 12.250.000</td><td class="n">18.450.000</td></tr>
+        <tr><td>01/11</td><td>Trả hàng TH-0011</td><td class="n">− 1.050.000</td><td class="n">17.400.000</td></tr>
+      </table>
+      <div class="row"><span class="field">Số tiền thu <i class="mk">1</i><span class="inp">10.000.000</span></span><span class="field">Hình thức<span class="inp sel">Chuyển khoản</span></span></div>
+      <div class="field">Ghi chú<span class="inp full">Thanh toán đợt tháng 10</span></div>
+      <div class="row between"><span class="sub">Còn lại sau khi thu: 7.400.000</span><span class="btn pri">Ghi nhận thanh toán</span></div>
+    </div>
+  </div>
+  <ol class="notes">
+    <li>Cho thu một phần. Tiền thu trừ vào khoản nợ cũ nhất trước, nên ngày "Nợ từ" tự cập nhật.</li>
+    <li>Sổ chi tiết thay cho cuốn sổ công nợ giấy: mỗi dòng gắn với phiếu bán, phiếu trả hoặc lần thu tiền.</li>
+    <li>Không cho thu quá số đang nợ.</li>
+  </ol>
+</template>
+
+<template id="s-import" data-title="Nhập hàng" data-uc="UC-13 · UC-09" data-roles="CH TK" data-group="Kho">
+  <div class="row between"><div class="h">Phiếu nhập PN-2026-1102-003</div><span class="sub">Thủ kho: Minh · 02/11/2026</span></div>
+  <div class="row"><span class="field">Nhà cung cấp <i class="mk">1</i><span class="inp sel" style="min-width:260px">Cơ khí Nam Tiến</span></span><span class="field">Số hóa đơn NCC<span class="inp">0004127</span></span></div>
+  <table class="t">
+    <tr><th>Món</th><th class="n">SL nhập</th><th>Đơn vị nhập <i class="mk">2</i></th><th class="n">= đơn vị gốc</th><th class="n">Giá nhập</th><th class="n">Thành tiền</th><th>Mã lô <i class="mk">3</i></th></tr>
+    <tr><td>Ốc vít M8 x 30</td><td class="n">20</td><td><span class="inp sel" style="min-width:70px">kg</span></td><td class="n">3.200 con</td><td class="n">52.000 / kg</td><td class="n">1.040.000</td><td>L-1102-01</td></tr>
+    <tr><td>Que hàn 3.2 ly</td><td class="n">15</td><td><span class="inp sel" style="min-width:70px">hộp</span></td><td class="n">75 kg</td><td class="n">310.000 / hộp</td><td class="n">4.650.000</td><td>L-1102-02</td></tr>
+    <tr><td><span class="inp sel full">+ Thêm món</span></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  </table>
+  <div class="row between"><div class="total" style="min-width:260px"><span>Tổng tiền nhập</span><b class="big">5.690.000</b></div><div class="row"><span class="btn">Lưu nháp</span><span class="btn pri">Lưu & cộng tồn kho</span></div></div>
+  <ol class="notes">
+    <li>Chọn từ danh mục nhà cung cấp; chưa có thì thêm nhanh ngay tại đây.</li>
+    <li><b>UC-09</b> Nhập theo đơn vị của nhà cung cấp (kg, hộp, cuộn); hệ thống quy về đơn vị gốc để cộng tồn.</li>
+    <li>Mỗi dòng là một lô với giá nhập riêng. Giá vốn khi bán lấy theo lô (FIFO hay bình quân: cần hỏi lại khách).</li>
+  </ol>
+</template>
+
+<template id="s-stock" data-title="Kiểm kê kho" data-uc="UC-14 · UC-15" data-roles="CH TK" data-group="Kho">
+  <div class="row between"><div><div class="h">Đợt kiểm kê KK-2026-11</div><div class="sub">Bắt đầu 02/11/2026 · Thủ kho: Minh</div></div><div class="row"><span class="inp sel">Kệ: A · Ốc vít, bu lông</span><span class="inp">🔍 Tìm món</span></div></div>
+  <table class="t">
+    <tr><th>Món</th><th>Đơn vị</th><th class="n">Sổ sách</th><th class="n">Thực tế <i class="mk">1</i></th><th class="n">Lệch</th><th>Lý do <i class="mk">2</i></th></tr>
+    <tr><td>Ốc vít M8 x 30</td><td>kg</td><td class="n">1,2</td><td class="n"><span class="inp" style="min-width:60px">1,2</span></td><td class="n">0</td><td></td></tr>
+    <tr class="hl"><td>Ốc vít M8 x 50</td><td>kg</td><td class="n">6,0</td><td class="n"><span class="inp" style="min-width:60px">5,4</span></td><td class="n"><span class="tag bad">− 0,6</span></td><td><span class="inp full">Rơi vãi, cân lại</span></td></tr>
+    <tr class="hl"><td>Bu lông M12 + tán</td><td>con</td><td class="n">340</td><td class="n"><span class="inp" style="min-width:60px">352</span></td><td class="n"><span class="tag warn">+ 12</span></td><td><span class="inp full err">Bắt buộc nhập lý do</span></td></tr>
+    <tr><td>Long đền M8</td><td>con</td><td class="n">1.500</td><td class="n"><span class="inp" style="min-width:60px">—</span></td><td class="n">chưa đếm</td><td></td></tr>
+  </table>
+  <div class="row between"><span class="sub">Đã đếm 3/4 món ở kệ A · 2 món lệch</span><div class="row"><span class="btn">Lưu tạm</span><span class="btn pri">Hoàn tất & báo chủ <i class="mk" style="background:#fff;color:var(--wf-line)">3</i></span></div></div>
+  <ol class="notes">
+    <li>Thủ kho nhập số đếm thực tế; cột lệch tự tính. Dùng được trên điện thoại khi đứng tại kệ (cần hỏi lại khách).</li>
+    <li><b>UC-15</b> Dòng có lệch được tô màu và bắt buộc ghi lý do.</li>
+    <li>Hoàn tất thì gửi danh sách lệch cho chủ (xem ở <b>Báo cáo › Chênh lệch kiểm kê</b>). Chủ duyệt mới điều chỉnh tồn kho.</li>
+  </ol>
+</template>
+
+<template id="s-products" data-title="Hàng hóa & đơn vị tính" data-uc="UC-02" data-roles="CH" data-group="Danh mục">
+  <div class="cols c-37">
+    <div class="panel"><div class="row between"><h4>Hàng hóa</h4><span class="btn sm">+ Thêm</span></div>
+      <span class="inp full">🔍 Tìm món</span>
+      <table class="t">
+        <tr><th>Mã</th><th>Tên</th></tr>
+        <tr class="sel"><td>OV-M8-30</td><td>Ốc vít M8 x 30</td></tr>
+        <tr><td>OV-M8-50</td><td>Ốc vít M8 x 50</td></tr>
+        <tr><td>DD-CAD-25</td><td>Dây điện Cadivi 2.5</td></tr>
+        <tr><td>XM-HT</td><td>Xi măng Hà Tiên</td></tr>
+        <tr><td>TH-4080</td><td>Thép hộp 40x80</td></tr>
+      </table>
+    </div>
+    <div class="panel"><h4>Ốc vít M8 x 30</h4>
+      <div class="cols c2"><div class="field">Mã hàng<span class="inp full">OV-M8-30</span></div><div class="field">Nhóm<span class="inp sel full">Ốc vít, bu lông</span></div></div>
+      <div class="cols c2"><div class="field">Đơn vị gốc (tính tồn kho) <i class="mk">1</i><span class="inp sel full">con</span></div><div class="field">Tồn tối thiểu <i class="mk">3</i><span class="inp full">5 kg</span></div></div>
+      <div class="field">Đơn vị bán & quy đổi <i class="mk">2</i></div>
+      <table class="t">
+        <tr><th>Đơn vị</th><th class="n">= số đơn vị gốc</th><th class="n">Giá bán</th><th>Dùng cho</th><th></th></tr>
+        <tr><td>con</td><td class="n">1</td><td class="n">500</td><td>Bán lẻ</td><td></td></tr>
+        <tr><td>kg</td><td class="n">160</td><td class="n">70.000</td><td>Bán sỉ</td><td>✕</td></tr>
+        <tr><td>hộp</td><td class="n">100</td><td class="n">48.000</td><td>Bán lẻ</td><td>✕</td></tr>
+        <tr><td colspan="5"><span class="btn sm">+ Thêm đơn vị</span></td></tr>
+      </table>
+      <div class="row between"><span class="btn">Ngừng kinh doanh</span><span class="btn pri">Lưu</span></div>
+    </div>
+  </div>
+  <ol class="notes">
+    <li>Mỗi món có một đơn vị gốc để tính tồn: ốc vít tính con, dây điện tính mét, xi măng tính bao.</li>
+    <li>Bảng quy đổi là nguồn cho <b>UC-09</b>: bán lẻ theo con, bán sỉ theo ký, dây điện theo mét hoặc cuộn.</li>
+    <li>Mức tồn tối thiểu dùng cho cảnh báo "Hàng sắp hết" (UC-20).</li>
+    <li>"Ngừng kinh doanh" ẩn món khỏi màn hình bán nhưng giữ lịch sử; dùng sau khi xem báo cáo hàng tồn lâu.</li>
+  </ol>
+</template>
+
+<template id="s-partners" data-title="Khách hàng & nhà cung cấp" data-uc="UC-03 · UC-04" data-roles="CH" data-group="Danh mục">
+  <div class="tabs"><span class="on">Khách hàng</span><span>Nhà cung cấp</span></div>
+  <div class="row between"><span class="inp wide">🔍 Tên hoặc số điện thoại</span><span class="btn pri">+ Thêm khách</span></div>
+  <table class="t">
+    <tr><th>Tên</th><th>Điện thoại</th><th>Loại <i class="mk">1</i></th><th>Mua chịu</th><th class="n">Còn nợ</th><th></th></tr>
+    <tr><td>Anh Tư (thầu Q.7)</td><td>0908 xxx 412</td><td>Nhà thầu</td><td><span class="tag ok">Cho phép</span></td><td class="n">17.400.000</td><td><span class="btn sm">Sửa</span></td></tr>
+    <tr><td>Cty XD Phú Lộc</td><td>028 xxxx 5521</td><td>Nhà thầu</td><td><span class="tag ok">Cho phép</span></td><td class="n">9.100.000</td><td><span class="btn sm">Sửa</span></td></tr>
+    <tr><td>Chị Hoa</td><td>0912 xxx 077</td><td>Khách quen</td><td><span class="tag">Không</span></td><td class="n">0</td><td><span class="btn sm">Sửa</span></td></tr>
+  </table>
+  <div class="hint">Tab <b>Nhà cung cấp</b> có cùng bố cục: tên, người liên hệ, điện thoại, mặt hàng chính, lần nhập gần nhất.</div>
+  <ol class="notes">
+    <li>Khách lẻ vãng lai không cần tạo; chỉ lưu nhà thầu và khách quen. Chỉ khách được bật "Mua chịu" mới chọn được "Ghi nợ" khi bán.</li>
+    <li>Không xóa khách còn nợ; chỉ ngừng cho mua chịu.</li>
+  </ol>
+</template>
+
+<template id="s-users" data-title="Tài khoản nhân viên" data-uc="UC-05" data-roles="CH" data-group="Danh mục">
+  <div class="row between"><div class="h">Tài khoản</div><span class="btn pri">+ Thêm tài khoản</span></div>
+  <table class="t">
+    <tr><th>Họ tên</th><th>Tên đăng nhập</th><th>Vai trò</th><th>Trạng thái</th><th></th></tr>
+    <tr><td>Nguyễn Thị Lan</td><td>lan.nv</td><td>NV bán hàng</td><td><span class="tag ok">Đang dùng</span></td><td><span class="btn sm">Sửa</span> <span class="btn sm">Đặt lại mật khẩu</span> <span class="btn sm">Khóa</span></td></tr>
+    <tr><td>Trần Văn Hùng</td><td>hung.nv</td><td>NV bán hàng</td><td><span class="tag ok">Đang dùng</span></td><td><span class="btn sm">Sửa</span> <span class="btn sm">Đặt lại mật khẩu</span> <span class="btn sm">Khóa</span></td></tr>
+    <tr><td>Lê Quang Minh</td><td>minh.kho</td><td>Thủ kho</td><td><span class="tag ok">Đang dùng</span></td><td><span class="btn sm">Sửa</span> <span class="btn sm">Đặt lại mật khẩu</span> <span class="btn sm">Khóa</span></td></tr>
+  </table>
+  <div class="panel"><h4>Quyền theo vai trò <i class="mk">1</i></h4>
+    <table class="t">
+      <tr><th>Chức năng</th><th>Chủ</th><th>NV bán hàng</th><th>Thủ kho</th></tr>
+      <tr><td>Bán hàng, trả hàng, thu nợ</td><td>✔</td><td>✔</td><td>—</td></tr>
+      <tr><td>Nhập hàng, kiểm kê</td><td>✔</td><td>—</td><td>✔</td></tr>
+      <tr><td>Danh mục, tài khoản</td><td>✔</td><td>—</td><td>—</td></tr>
+      <tr><td>Báo cáo, giá nhập, lãi lỗ</td><td>✔</td><td>—</td><td>—</td></tr>
+    </table>
+  </div>
+  <ol class="notes">
+    <li>Quyền gắn cố định theo vai trò, đủ cho cửa hàng 4 người. Bảng này chỉ để xem; muốn tách quyền chi tiết hơn cần hỏi lại khách.</li>
+    <li>Khóa thay vì xóa, để phiếu bán cũ vẫn giữ tên nhân viên cho báo cáo doanh số.</li>
+  </ol>
+</template>
+
+<template id="s-reports" data-title="Báo cáo" data-uc="UC-16 → UC-22" data-roles="CH" data-group="Báo cáo">
+  <div class="row between"><div class="row"><span class="inp sel">Tháng 10/2026</span><i class="mk">1</i></div><span class="btn">Xuất Excel</span></div>
+  <div class="tabs" id="rtabs">
+    <span class="on" data-r="pl">Lãi lỗ</span><span data-r="debt">Công nợ</span><span data-r="sales">Doanh số NV</span><span data-r="low">Hàng sắp hết</span><span data-r="slow">Tồn lâu</span><span data-r="diff">Chênh lệch kiểm kê</span>
+  </div>
+  <div data-rp="pl" class="cols c2">
+    <div class="panel"><div class="total">
+      <span>Doanh thu bán hàng</span><b>412.600.000</b>
+      <span>Hàng trả lại</span><b>− 2.150.000</b>
+      <span>Doanh thu thuần</span><b>410.450.000</b>
+      <span>Giá vốn (theo lô nhập) <i class="mk">2</i></span><b>− 331.900.000</b>
+      <span class="h">Lãi gộp</span><b class="big">78.550.000</b>
+    </div></div>
+    <div class="img"><span>Biểu đồ cột: lãi gộp 6 tháng gần nhất</span></div>
+  </div>
+  <div data-rp="debt" hidden><table class="t"><tr><th>Khách</th><th class="n">Đầu tháng</th><th class="n">Phát sinh</th><th class="n">Đã thu</th><th class="n">Cuối tháng</th><th>Nợ từ</th></tr>
+    <tr><td>Anh Tư (thầu Q.7)</td><td class="n">6.200.000</td><td class="n">12.250.000</td><td class="n">0</td><td class="n">18.450.000</td><td>03/09/2026</td></tr>
+    <tr><td>Cty XD Phú Lộc</td><td class="n">9.100.000</td><td class="n">0</td><td class="n">0</td><td class="n">9.100.000</td><td>21/09/2026</td></tr></table></div>
+  <div data-rp="sales" hidden><table class="t"><tr><th>Nhân viên</th><th class="n">Số phiếu</th><th class="n">Doanh số</th><th class="n">Hàng trả</th><th class="n">Doanh số thuần</th></tr>
+    <tr><td>Nguyễn Thị Lan</td><td class="n">612</td><td class="n">228.400.000</td><td class="n">0</td><td class="n">228.400.000</td></tr>
+    <tr><td>Trần Văn Hùng</td><td class="n">541</td><td class="n">184.200.000</td><td class="n">2.150.000</td><td class="n">182.050.000</td></tr></table></div>
+  <div data-rp="low" hidden><table class="t"><tr><th>Món</th><th class="n">Tồn</th><th class="n">Tối thiểu</th><th class="n">Bán TB / tuần</th><th>NCC gần nhất</th></tr>
+    <tr><td>Ốc vít M8 x 30</td><td class="n">1,2 kg</td><td class="n">5 kg</td><td class="n">3 kg</td><td>Cơ khí Nam Tiến</td></tr>
+    <tr><td>Dây điện Cadivi 2.5</td><td class="n">40 m</td><td class="n">200 m</td><td class="n">150 m</td><td>Đại lý Cadivi Phú Mỹ</td></tr></table></div>
+  <div data-rp="slow" hidden><table class="t"><tr><th>Món</th><th class="n">Tồn</th><th>Lần bán cuối</th><th class="n">Giá trị tồn</th></tr>
+    <tr><td>Bản lề cối inox 3 tấc</td><td class="n">86 cái</td><td>14/09/2025</td><td class="n">3.010.000</td></tr>
+    <tr><td>Sơn chống gỉ xám 18L</td><td class="n">5 thùng</td><td>chưa bán lần nào</td><td class="n">6.250.000</td></tr></table></div>
+  <div data-rp="diff" hidden><table class="t"><tr><th>Đợt</th><th>Món</th><th class="n">Lệch</th><th>Lý do</th><th></th></tr>
+    <tr><td>KK-2026-11</td><td>Ốc vít M8 x 50</td><td class="n">− 0,6 kg</td><td>Rơi vãi, cân lại</td><td><span class="btn sm">Duyệt điều chỉnh</span></td></tr>
+    <tr><td>KK-2026-11</td><td>Bu lông M12 + tán</td><td class="n">+ 12 con</td><td>Nhập thiếu sổ lô trước</td><td><span class="btn sm">Duyệt điều chỉnh</span></td></tr></table></div>
+  <ol class="notes">
+    <li><b>UC-16</b> Xem báo cáo: một màn hình chung, chọn kỳ rồi chuyển tab cho từng loại báo cáo (UC-17 → UC-22). Bấm các tab để xem.</li>
+    <li>Giá vốn tính theo giá nhập từng lô; cách chọn lô (FIFO hay bình quân) cần chốt với khách.</li>
+    <li>Ngưỡng "tồn lâu" mặc định 12 tháng không bán, chủ chỉnh được.</li>
+  </ol>
+</template>
+
+<script>
+(function () {
+  var MENU = ["s-home", "s-pos", "s-return", "s-debt", "s-import", "s-stock", "s-products", "s-partners", "s-users", "s-reports"];
+  var ROLE_NAME = { CH: "Chủ cửa hàng", NV: "NV bán hàng", TK: "Thủ kho" };
+  var USER = { CH: "Anh Phát · Chủ", NV: "Lan · NV bán hàng", TK: "Minh · Thủ kho" };
+  var screens = [].slice.call(document.querySelectorAll("template[id^='s-']"));
+  var role = "CH";
+  var current = (location.hash || "").replace("#", "") || "s-login";
+  if (!document.getElementById(current)) current = "s-login";
+
+  function can(t) { return t.dataset.roles.split(" ").indexOf(role) >= 0; }
+
+  function renderNav() {
+    var nav = document.getElementById("nav"), html = "", last = "";
+    screens.forEach(function (t) {
+      if (t.dataset.group !== last) { html += "<h3>" + t.dataset.group + "</h3>"; last = t.dataset.group; }
+      html += '<a href="#' + t.id + '" class="' + (t.id === current ? "active " : "") + (can(t) ? "" : "locked") + '">' +
+        t.dataset.title + "<small>" + t.dataset.uc.split(" ")[0] + "</small></a>";
+    });
+    nav.innerHTML = html;
+  }
+
+  function render() {
+    var t = document.getElementById(current);
+    document.getElementById("m-title").textContent = t.dataset.title;
+    document.getElementById("m-uc").textContent = t.dataset.uc;
+    document.getElementById("m-who").textContent = "Vai trò được dùng: " + t.dataset.roles.split(" ").map(function (r) { return ROLE_NAME[r]; }).join(", ");
+
+    var frag = t.content.cloneNode(true);
+    var notes = frag.querySelector(".notes");
+    document.getElementById("notes").innerHTML = notes ? notes.innerHTML : "";
+    if (notes) notes.remove();
+    frag.querySelectorAll("[data-roles]").forEach(function (el) {
+      if (el.dataset.roles.split(" ").indexOf(role) < 0) el.remove();
+    });
+
+    var dev = document.getElementById("device");
+    dev.className = "device" + ("bare" in t.dataset ? " bare" : "");
+    dev.innerHTML = '<div class="browser"><i></i><i></i><i></i><span>thanhphat.vn/' + current.slice(2) + "</span></div>";
+    if ("bare" in t.dataset) { dev.appendChild(frag); }
+    else {
+      var app = document.createElement("div"); app.className = "app";
+      var menu = MENU.map(function (id) {
+        var s = document.getElementById(id);
+        return can(s) ? '<a href="#' + id + '" class="' + (id === current ? "active" : "") + '">' + s.dataset.title + "</a>" : "";
+      }).join("");
+      app.innerHTML = '<div class="topbar"><div class="logo"><i></i>THÀNH PHÁT</div><div class="userbox"><span>' + USER[role] +
+        '</span><span class="btn sm">Đổi mật khẩu</span><a class="btn sm" href="#s-login">Đăng xuất</a></div></div><nav class="side">' + menu + '</nav><div class="content"></div>';
+      var content = app.querySelector(".content");
+      if (can(t)) content.appendChild(frag);
+      else content.innerHTML = '<div class="denied"><div class="h">Bạn không có quyền vào màn hình này</div><p>Vai trò ' + ROLE_NAME[role] + " không được dùng chức năng " + t.dataset.title + ". Menu bên trái đã ẩn mục này.</p></div>";
+      dev.appendChild(app);
+    }
+    var rt = dev.querySelector("#rtabs");
+    if (rt) rt.addEventListener("click", function (e) {
+      var k = e.target.dataset && e.target.dataset.r; if (!k) return;
+      rt.querySelectorAll("span").forEach(function (s) { s.classList.toggle("on", s.dataset.r === k); });
+      dev.querySelectorAll("[data-rp]").forEach(function (p) { p.hidden = p.dataset.rp !== k; });
+    });
+    renderNav();
+  }
+
+  window.addEventListener("hashchange", function () {
+    var id = location.hash.replace("#", "");
+    if (document.getElementById(id)) { current = id; render(); }
+  });
+  document.querySelectorAll(".roles button").forEach(function (b) {
+    b.addEventListener("click", function () {
+      role = b.dataset.role;
+      document.querySelectorAll(".roles button").forEach(function (x) { x.setAttribute("aria-pressed", x === b); });
+      render();
+    });
+  });
+  render();
+})();
+</script>
+</body>
+</html>

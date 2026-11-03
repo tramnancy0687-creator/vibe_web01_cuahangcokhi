@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="vi">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>body{margin:0}</style>
+<title>Use Case Thành Phát</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Be+Vietnam+Pro:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: one wide diagram sheet like a shop-floor drawing, then actor notes, use case table, open questions */
+:root {
+  --bg: #eef0ee;
+  --surface: #ffffff;
+  --ink: #1c2227;
+  --muted: #5a646c;
+  --line: #c6ccd0;
+  --accent: #b86a00;
+  --pk-sales: rgba(47, 111, 159, 0.07);
+  --pk-kho: rgba(70, 130, 90, 0.08);
+  --pk-owner: rgba(184, 106, 0, 0.07);
+  --pk-stroke: #9aa5ad;
+  --font-display: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --font-body: "Be Vietnam Pro", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #14181b; --surface: #1c2226; --ink: #e4e8ea; --muted: #99a3ab; --line: #364047;
+    --accent: #f0a540; --pk-sales: rgba(90, 160, 210, 0.08); --pk-kho: rgba(110, 180, 130, 0.08);
+    --pk-owner: rgba(240, 165, 64, 0.08); --pk-stroke: #56626a; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #14181b; --surface: #1c2226; --ink: #e4e8ea; --muted: #99a3ab; --line: #364047;
+  --accent: #f0a540; --pk-sales: rgba(90, 160, 210, 0.08); --pk-kho: rgba(110, 180, 130, 0.08);
+  --pk-owner: rgba(240, 165, 64, 0.08); --pk-stroke: #56626a; color-scheme: dark;
+}
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.6; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-block: 40px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 40px; }
+header { display: grid; gap: 6px; }
+.eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+h1 { font-family: var(--font-display); font-weight: 700; font-size: clamp(34px, 6vw, 52px); line-height: 1.05; margin: 0; text-wrap: balance; text-transform: uppercase; letter-spacing: .01em; }
+h2 { font-family: var(--font-display); font-weight: 600; font-size: 26px; margin: 0; text-transform: uppercase; letter-spacing: .02em; }
+.lede { color: var(--muted); max-width: 65ch; margin: 0; }
+section { display: grid; gap: 16px; }
+
+.sheet { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; overflow-x: auto; }
+.sheet svg { display: block; min-width: 980px; width: 100%; height: auto; }
+.sheet svg.small { min-width: 640px; max-width: 860px; }
+h3.sub { margin: 16px 0 0; font-size: 17px; font-weight: 600; }
+svg .gen { stroke: var(--ink); stroke-width: 1.3; fill: none; }
+svg .gen-head { fill: var(--surface); stroke: var(--ink); stroke-width: 1.3; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 24px; font-size: 13px; color: var(--muted); align-items: center; }
+.legend span { display: inline-flex; align-items: center; gap: 8px; }
+.legend svg { flex: none; }
+
+svg .frame-sales { fill: var(--pk-sales); stroke: var(--pk-stroke); }
+svg .frame-kho { fill: var(--pk-kho); stroke: var(--pk-stroke); }
+svg .frame-owner { fill: var(--pk-owner); stroke: var(--pk-stroke); }
+svg .frame-label { fill: var(--muted); font: 600 11px var(--font-body); letter-spacing: .1em; }
+svg .boundary { fill: none; stroke: var(--ink); stroke-width: 1.4; }
+svg .sys-title { fill: var(--ink); font: 600 18px var(--font-display); letter-spacing: .04em; }
+svg .uc { fill: var(--surface); stroke: var(--ink); stroke-width: 1.3; }
+svg .uc-shared { stroke: var(--accent); }
+svg .uc-id { fill: var(--accent); font: 500 10px var(--font-mono); }
+svg .uc-name { fill: var(--ink); font: 500 13.5px var(--font-body); }
+svg .assoc { stroke: var(--muted); stroke-width: 1.1; fill: none; }
+svg .dep { stroke: var(--accent); stroke-width: 1.3; stroke-dasharray: 6 4; fill: none; }
+svg .dep-label { fill: var(--accent); font: 500 11px var(--font-mono); paint-order: stroke; stroke: var(--surface); stroke-width: 5px; stroke-linejoin: round; }
+svg .actor { stroke: var(--ink); stroke-width: 1.6; fill: none; }
+svg .actor-head { fill: var(--surface); stroke: var(--ink); stroke-width: 1.6; }
+svg .actor-name { fill: var(--ink); font: 600 13px var(--font-body); }
+svg .arrow { fill: var(--accent); }
+
+.actors { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+.actor-card { border-top: 2px solid var(--ink); padding-top: 10px; display: grid; gap: 4px; min-width: 0; }
+.actor-card h3 { margin: 0; font-size: 16px; font-weight: 600; }
+.actor-card p { margin: 0; color: var(--muted); font-size: 14px; }
+.note { font-size: 14px; color: var(--muted); max-width: 75ch; margin: 0; }
+.note strong { color: var(--ink); font-weight: 600; }
+
+.table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; }
+table { border-collapse: collapse; width: 100%; min-width: 720px; font-size: 14px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+thead th { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 600; }
+tr.group td { font-family: var(--font-display); font-size: 17px; font-weight: 600; text-transform: uppercase; letter-spacing: .03em; background: var(--bg); }
+td.id { font-family: var(--font-mono); color: var(--accent); white-space: nowrap; font-size: 13px; }
+td.name { font-weight: 600; white-space: nowrap; }
+td .rel { display: block; font-family: var(--font-mono); font-size: 12px; color: var(--accent); margin-top: 2px; }
+tbody tr:last-child td { border-bottom: 0; }
+
+ol.questions { margin: 0; padding-left: 22px; display: grid; gap: 8px; max-width: 75ch; }
+ol.questions li::marker { color: var(--accent); font-family: var(--font-mono); font-size: 13px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Bài 1 · Khách hàng kể · Phân tích use case</div>
+    <h1>Cửa hàng Thành Phát</h1>
+    <p class="lede">Từ lời kể của chủ cửa hàng đồ cơ khí và vật tư xây dựng, mình rút ra 3 người dùng hệ thống và 23 use case cho một ứng dụng web, chia thành 4 nhóm: bán hàng & công nợ, kho, quản trị & báo cáo, tài khoản.</p>
+  </header>
+
+  <section aria-labelledby="h-diagram">
+    <h2 id="h-diagram">Sơ đồ use case</h2>
+    <div class="legend">
+      <span><svg width="40" height="10" aria-hidden="true"><line x1="0" y1="5" x2="40" y2="5" stroke="currentColor" stroke-width="1.2"/></svg>Tác nhân thực hiện</span>
+      <span><svg width="40" height="10" aria-hidden="true"><line x1="0" y1="5" x2="32" y2="5" stroke="var(--accent)" stroke-width="1.3" stroke-dasharray="6 4"/><path d="M32 1 L40 5 L32 9 Z" fill="var(--accent)"/></svg>«include»: luôn chạy kèm · «extend»: chỉ chạy khi có điều kiện</span>
+      <span><svg width="26" height="14" aria-hidden="true"><ellipse cx="13" cy="7" rx="12" ry="6" fill="none" stroke="var(--accent)" stroke-width="1.3"/></svg>Use case con, dùng chung</span>
+    </div>
+    <div class="sheet">
+      <svg id="diagram" viewBox="0 0 1420 860" role="img" aria-label="Sơ đồ use case hệ thống quản lý cửa hàng Thành Phát"></svg>
+    </div>
+    <h3 class="sub">Tài khoản & đăng nhập</h3>
+    <p class="note">Vì là ứng dụng web, ai cũng phải đăng nhập trước khi dùng các chức năng ở sơ đồ trên. Ba tác nhân đều là <strong>Người dùng</strong> (quan hệ tổng quát hóa), và hệ thống dựa vào vai trò của tài khoản để mở đúng chức năng. Riêng chủ cửa hàng tạo tài khoản và phân quyền cho nhân viên.</p>
+    <div class="sheet">
+      <svg id="diagram-auth" class="small" viewBox="0 0 860 370" role="img" aria-label="Sơ đồ use case tài khoản và đăng nhập"></svg>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-actors">
+    <h2 id="h-actors">Tác nhân</h2>
+    <div class="actors">
+      <div class="actor-card"><h3>Nhân viên bán hàng (2 người)</h3><p>Tra hàng, báo giá, lập phiếu bán, thu nợ, nhận hàng trả lại. Doanh số ghi theo từng nhân viên.</p></div>
+      <div class="actor-card"><h3>Thủ kho (1 người)</h3><p>Lập phiếu nhập theo từng lô và nhà cung cấp, định kỳ kiểm kê và ghi lại chỗ lệch.</p></div>
+      <div class="actor-card"><h3>Chủ cửa hàng</h3><p>Khai báo hàng hóa, đơn vị tính, khách và nhà cung cấp; xem cảnh báo tồn kho và các báo cáo cuối tháng.</p></div>
+    </div>
+    <p class="note"><strong>Chủ cửa hàng</strong> cũng làm được mọi việc của nhân viên và thủ kho (quan hệ tổng quát hóa). Trên sơ đồ mình không vẽ mũi tên này để đỡ rối. <strong>Khách lẻ, nhà thầu và nhà cung cấp</strong> không tự dùng phần mềm. Nhân viên thao tác thay cho họ, nên họ không phải tác nhân của hệ thống; họ là dữ liệu (khách hàng, nhà cung cấp) mà hệ thống quản lý.</p>
+  </section>
+
+  <section aria-labelledby="h-list">
+    <h2 id="h-list">Danh sách use case</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Mã</th><th>Use case</th><th>Tác nhân</th><th>Nghiệp vụ rút ra từ lời kể</th></tr></thead>
+        <tbody>
+          <tr class="group"><td colspan="4">Bán hàng & công nợ</td></tr>
+          <tr><td class="id">UC-01</td><td class="name">Tra cứu hàng & tồn kho</td><td>NV bán hàng</td><td>Khách hỏi món gì thì tìm theo tên hoặc mã, xem còn bao nhiêu, hiển thị theo đơn vị tính của món đó.</td></tr>
+          <tr><td class="id">UC-02</td><td class="name">Báo giá</td><td>NV bán hàng</td><td>Báo giá theo đơn vị bán: lẻ tính con, sỉ tính ký, dây điện tính mét.<span class="rel">«include» UC-01</span></td></tr>
+          <tr><td class="id">UC-03</td><td class="name">Lập phiếu bán hàng</td><td>NV bán hàng</td><td>Khách đồng ý thì xuất hàng và lập phiếu. Phiếu ghi tên nhân viên bán để tính doanh số. Khách lẻ trả tiền ngay.<span class="rel">«include» UC-11 · được mở rộng bởi UC-04</span></td></tr>
+          <tr><td class="id">UC-04</td><td class="name">Ghi nợ khách thầu</td><td>(tự động)</td><td>Khi khách là nhà thầu lấy hàng chịu: ghi số nợ theo từng người và ngày phát sinh nợ.<span class="rel">«extend» UC-03 [khách mua chịu]</span></td></tr>
+          <tr><td class="id">UC-05</td><td class="name">Thu tiền công nợ</td><td>NV bán hàng</td><td>Nhà thầu thanh toán một lần cuối tháng; giảm số nợ tương ứng.</td></tr>
+          <tr><td class="id">UC-06</td><td class="name">Nhận trả hàng</td><td>NV bán hàng</td><td>Chỉ nhận hàng còn nguyên; cộng lại vào tồn kho.</td></tr>
+          <tr><td class="id">UC-07</td><td class="name">Trừ công nợ khi trả hàng</td><td>(tự động)</td><td>Giá trị hàng trả được trừ vào công nợ của khách.<span class="rel">«extend» UC-06 [khách đang có nợ]</span></td></tr>
+          <tr class="group"><td colspan="4">Kho</td></tr>
+          <tr><td class="id">UC-08</td><td class="name">Lập phiếu nhập hàng</td><td>Thủ kho</td><td>Mỗi lần nhập là một lô: nhà cung cấp, số lượng, giá nhập riêng của đợt đó, để biết lô nào giá bao nhiêu.<span class="rel">«include» UC-11</span></td></tr>
+          <tr><td class="id">UC-09</td><td class="name">Kiểm kê kho</td><td>Thủ kho</td><td>Đếm hàng thực tế và đối chiếu với số trên sổ sách.</td></tr>
+          <tr><td class="id">UC-10</td><td class="name">Ghi nhận chênh lệch</td><td>(tự động)</td><td>Khi số thực tế khác sổ sách: ghi lại chỗ lệch để báo chủ.<span class="rel">«extend» UC-09 [có lệch]</span></td></tr>
+          <tr class="group"><td colspan="4">Dùng chung</td></tr>
+          <tr><td class="id">UC-11</td><td class="name">Quy đổi đơn vị tính</td><td>(tự động)</td><td>Đổi giữa con ↔ ký, cuộn ↔ mét theo tỉ lệ khai báo ở UC-12, để tồn kho luôn tính trên một đơn vị gốc.</td></tr>
+          <tr class="group"><td colspan="4">Quản trị & báo cáo</td></tr>
+          <tr><td class="id">UC-12</td><td class="name">Quản lý hàng hóa & đơn vị tính</td><td>Chủ cửa hàng</td><td>Khai báo món hàng, đơn vị gốc, các đơn vị bán và tỉ lệ quy đổi, giá bán lẻ/sỉ.</td></tr>
+          <tr><td class="id">UC-13</td><td class="name">Quản lý khách hàng & nhà cung cấp</td><td>Chủ cửa hàng</td><td>Danh sách nhà thầu được mua chịu và các nhà cung cấp.</td></tr>
+          <tr><td class="id">UC-14</td><td class="name">Xem hàng sắp hết</td><td>Chủ cửa hàng</td><td>Món có tồn dưới mức tối thiểu, để đặt thêm.</td></tr>
+          <tr><td class="id">UC-15</td><td class="name">Xem hàng tồn lâu không bán</td><td>Chủ cửa hàng</td><td>Món nằm kho lâu (ví dụ cả năm) không có phiếu bán, để ngừng nhập.</td></tr>
+          <tr><td class="id">UC-16</td><td class="name">Báo cáo lãi lỗ tháng</td><td>Chủ cửa hàng</td><td>Doanh thu trừ giá vốn, giá vốn lấy theo giá nhập của từng lô.</td></tr>
+          <tr><td class="id">UC-17</td><td class="name">Báo cáo công nợ phải thu</td><td>Chủ cửa hàng</td><td>Ai còn nợ, nợ bao nhiêu, nợ từ ngày nào.</td></tr>
+          <tr><td class="id">UC-18</td><td class="name">Báo cáo doanh số nhân viên</td><td>Chủ cửa hàng</td><td>Doanh số theo từng nhân viên bán trong tháng, dùng để tính thưởng.</td></tr>
+          <tr><td class="id">UC-19</td><td class="name">Xem chênh lệch kiểm kê</td><td>Chủ cửa hàng</td><td>Xem các lần kiểm kê bị lệch do thủ kho ghi lại.</td></tr>
+          <tr class="group"><td colspan="4">Tài khoản (web)</td></tr>
+          <tr><td class="id">UC-20</td><td class="name">Đăng nhập</td><td>Người dùng</td><td>Đăng nhập bằng tài khoản riêng; hệ thống mở menu theo vai trò (bán hàng, kho, chủ). Cần có trước để phiếu bán tự ghi đúng nhân viên.</td></tr>
+          <tr><td class="id">UC-21</td><td class="name">Đổi mật khẩu</td><td>Người dùng</td><td>Mỗi người tự đổi mật khẩu của mình.</td></tr>
+          <tr><td class="id">UC-22</td><td class="name">Đăng xuất</td><td>Người dùng</td><td>Quan trọng khi nhiều người dùng chung máy tính ở quầy.</td></tr>
+          <tr><td class="id">UC-23</td><td class="name">Quản lý tài khoản & phân quyền</td><td>Chủ cửa hàng</td><td>Tạo, khóa tài khoản nhân viên và gán vai trò, để nhân viên không xem được giá nhập, lãi lỗ.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-q">
+    <h2 id="h-q">Câu hỏi cần hỏi lại khách</h2>
+    <ol class="questions">
+      <li>Khi bán, giá vốn lấy theo lô nào: lô nhập trước (FIFO) hay giá bình quân? Điều này quyết định cách tính lãi ở UC-16.</li>
+      <li>Tỉ lệ quy đổi con ↔ ký cố định cho từng loại ốc vít, hay mỗi lô nhập lại khác?</li>
+      <li>Nhà thầu có hạn mức nợ không? Quá hạn cuối tháng chưa trả thì xử lý thế nào?</li>
+      <li>Hàng trả lại không còn nguyên thì từ chối hẳn hay nhận với giá thấp hơn? Khách lẻ trả hàng thì hoàn tiền mặt?</li>
+      <li>"Sắp hết" là dưới bao nhiêu, và "nằm kho lâu" là bao lâu? Mỗi món một ngưỡng riêng hay dùng chung một ngưỡng?</li>
+      <li>Nhân viên được xem những gì: giá nhập, lãi lỗ, doanh số của người khác? Câu trả lời quyết định bảng phân quyền ở UC-23.</li>
+      <li>Có cần dùng trên điện thoại không (thủ kho kiểm kê ngay tại kệ hàng)? Có cần in phiếu bán từ trình duyệt không?</li>
+      <li>Khi kiểm kê bị lệch, chủ có điều chỉnh tồn kho theo số thực tế luôn không?</li>
+    </ol>
+  </section>
+</div>
+
+<script>
+(function () {
+  var NS = "http://www.w3.org/2000/svg";
+  var svg = document.getElementById("diagram");
+  function el(tag, attrs, parent) {
+    var e = document.createElementNS(NS, tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    (parent || svg).appendChild(e);
+    return e;
+  }
+  function text(x, y, cls, s, anchor) {
+    var t = el("text", { x: x, y: y, "class": cls, "text-anchor": anchor || "middle" });
+    t.textContent = s;
+    return t;
+  }
+
+  var defs = el("defs", {});
+  var m = el("marker", { id: "arr", viewBox: "0 0 10 10", refX: "9", refY: "5", markerWidth: "9", markerHeight: "9", orient: "auto-start-reverse" }, defs);
+  el("path", { d: "M0 0 L10 5 L0 10 Z", "class": "arrow" }, m);
+
+  // System boundary and packages
+  text(707, 24, "sys-title", "HỆ THỐNG QUẢN LÝ CỬA HÀNG THÀNH PHÁT");
+  el("rect", { x: 180, y: 36, width: 1055, height: 804, rx: 10, "class": "boundary" });
+  el("rect", { x: 195, y: 46, width: 680, height: 482, rx: 6, "class": "frame-sales" });
+  el("rect", { x: 195, y: 625, width: 680, height: 203, rx: 6, "class": "frame-kho" });
+  el("rect", { x: 890, y: 46, width: 330, height: 782, rx: 6, "class": "frame-owner" });
+  text(210, 64, "frame-label", "BÁN HÀNG & CÔNG NỢ", "start");
+  text(210, 643, "frame-label", "KHO", "start");
+  text(905, 64, "frame-label", "QUẢN TRỊ & BÁO CÁO", "start");
+
+  var S = { cx: 430, rx: 125 }, M = { cx: 745, rx: 115 }, O = { cx: 1055, rx: 145 }, RY = 30;
+  var nodes = {};
+  function uc(id, col, y, name, shared) { nodes[id] = { id: id, x: col.cx, y: y, rx: col.rx, name: name, shared: shared }; }
+  uc("UC-01", S, 110, "Tra cứu hàng & tồn kho");
+  uc("UC-02", S, 210, "Báo giá");
+  uc("UC-05", S, 300, "Thu tiền công nợ");
+  uc("UC-06", S, 390, "Nhận trả hàng");
+  uc("UC-03", S, 480, "Lập phiếu bán hàng");
+  uc("UC-07", M, 390, "Trừ công nợ khi trả hàng", true);
+  uc("UC-04", M, 480, "Ghi nợ khách thầu", true);
+  uc("UC-11", M, 585, "Quy đổi đơn vị tính", true);
+  uc("UC-08", S, 690, "Lập phiếu nhập hàng (lô)");
+  uc("UC-09", S, 775, "Kiểm kê kho");
+  uc("UC-10", M, 775, "Ghi nhận chênh lệch", true);
+  var owner = ["Quản lý hàng hóa & đơn vị tính", "Quản lý khách hàng & NCC", "Xem hàng sắp hết", "Xem hàng tồn lâu không bán",
+               "Báo cáo lãi lỗ tháng", "Báo cáo công nợ phải thu", "Báo cáo doanh số nhân viên", "Xem chênh lệch kiểm kê"];
+  owner.forEach(function (n, i) { uc("UC-" + (12 + i), O, Math.round(115 + i * 96.4), n); });
+
+  function edge(n, tx, ty) {
+    var dx = tx - n.x, dy = ty - n.y;
+    var t = 1 / Math.sqrt((dx / n.rx) * (dx / n.rx) + (dy / RY) * (dy / RY));
+    return [n.x + dx * t, n.y + dy * t];
+  }
+
+  var lines = el("g", {});
+
+  // Actors
+  function actor(x, y, label) {
+    var g = el("g", {});
+    el("circle", { cx: x, cy: y - 62, r: 13, "class": "actor-head" }, g);
+    el("path", { d: "M" + x + " " + (y - 49) + " V" + (y - 10) + " M" + (x - 20) + " " + (y - 36) + " H" + (x + 20) +
+      " M" + (x - 16) + " " + (y + 16) + " L" + x + " " + (y - 10) + " L" + (x + 16) + " " + (y + 16), "class": "actor" }, g);
+    label.forEach(function (s, i) { var t = text(x, y + 38 + i * 17, "actor-name", s); g.appendChild(t); });
+    return { x: x, y: y - 30 };
+  }
+  var sales = actor(88, 318, ["Nhân viên", "bán hàng"]);
+  var kho = actor(88, 755, ["Thủ kho"]);
+  var boss = actor(1330, 470, ["Chủ", "cửa hàng"]);
+
+  function assoc(a, id, side) {
+    var n = nodes[id], p = edge(n, a.x, a.y);
+    el("line", { x1: a.x + side * 24, y1: a.y, x2: p[0], y2: p[1], "class": "assoc" }, lines);
+  }
+  ["UC-01", "UC-02", "UC-05", "UC-06", "UC-03"].forEach(function (id) { assoc(sales, id, 1); });
+  ["UC-08", "UC-09"].forEach(function (id) { assoc(kho, id, 1); });
+  for (var i = 12; i <= 19; i++) assoc(boss, "UC-" + i, -1);
+
+  function dep(from, to, kind) {
+    var a = nodes[from], b = nodes[to];
+    var p = edge(a, b.x, b.y), q = edge(b, a.x, a.y);
+    el("line", { x1: p[0], y1: p[1], x2: q[0], y2: q[1], "class": "dep", "marker-end": "url(#arr)" }, lines);
+    var mx = (p[0] + q[0]) / 2, my = (p[1] + q[1]) / 2;
+    var vertical = Math.abs(p[0] - q[0]) < 4;
+    var t = text(vertical ? mx + 8 : mx, vertical ? my + 4 : my - 6, "dep-label", "«" + kind + "»", vertical ? "start" : "middle");
+    lines.appendChild(t);
+  }
+  dep("UC-02", "UC-01", "include");
+  dep("UC-03", "UC-11", "include");
+  dep("UC-08", "UC-11", "include");
+  dep("UC-04", "UC-03", "extend");
+  dep("UC-07", "UC-06", "extend");
+  dep("UC-10", "UC-09", "extend");
+
+  // Ellipses drawn last so lines tuck under them
+  Object.keys(nodes).forEach(function (id) {
+    var n = nodes[id];
+    el("ellipse", { cx: n.x, cy: n.y, rx: n.rx, ry: RY, "class": "uc" + (n.shared ? " uc-shared" : "") });
+    text(n.x, n.y - 6, "uc-id", n.id);
+    text(n.x, n.y + 12, "uc-name", n.name);
+  });
+
+  // Account diagram: three actors generalize to "Người dùng"
+  svg = document.getElementById("diagram-auth");
+  var d2 = el("defs", {});
+  var g2 = el("marker", { id: "gen", viewBox: "0 0 14 14", refX: "13", refY: "7", markerWidth: "14", markerHeight: "14", markerUnits: "userSpaceOnUse", orient: "auto" }, d2);
+  el("path", { d: "M1 1 L13 7 L1 13 Z", "class": "gen-head" }, g2);
+
+  el("rect", { x: 500, y: 20, width: 320, height: 340, rx: 10, "class": "boundary" });
+  nodes = {};
+  var A = { cx: 660, rx: 130 };
+  uc("UC-20", A, 80, "Đăng nhập");
+  uc("UC-21", A, 160, "Đổi mật khẩu");
+  uc("UC-22", A, 240, "Đăng xuất");
+  uc("UC-23", A, 320, "Quản lý tài khoản & phân quyền");
+  nodes["UC-23"].rx = 145; nodes["UC-23"].x = 660;
+
+  lines = el("g", {});
+  var user = actor(210, 150, []);
+  text(180, 112, "actor-name", "Người dùng", "end");
+  [[90, ["Nhân viên", "bán hàng"]], [210, ["Thủ kho"]], [330, ["Chủ", "cửa hàng"]]].forEach(function (c) {
+    var a = actor(c[0], 300, c[1]);
+    el("line", { x1: c[0], y1: 222, x2: 210, y2: 170, "class": "gen", "marker-end": "url(#gen)" }, lines);
+    if (c[0] === 330) assoc(a, "UC-23", 1);
+  });
+  ["UC-20", "UC-21", "UC-22"].forEach(function (id) { assoc(user, id, 1); });
+
+  Object.keys(nodes).forEach(function (id) {
+    var n = nodes[id];
+    el("ellipse", { cx: n.x, cy: n.y, rx: n.rx, ry: RY, "class": "uc" });
+    text(n.x, n.y - 6, "uc-id", n.id);
+    text(n.x, n.y + 12, "uc-name", n.name);
+  });
+})();
+</script>

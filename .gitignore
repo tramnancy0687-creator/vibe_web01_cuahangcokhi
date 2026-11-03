@@ -1,0 +1,21 @@
+# Phụ thuộc và bản build
+node_modules/
+.next/
+out/
+build/
+
+# CSDL SQLite: tự tạo khi chạy, chứa dữ liệu thật của cửa hàng
+data/
+*.db
+*.db-wal
+*.db-shm
+
+# Biến môi trường, bí mật
+.env*
+!.env.example
+
+# Hệ điều hành, editor
+.DS_Store
+Thumbs.db
+*.log
+.claude/settings.local.json
