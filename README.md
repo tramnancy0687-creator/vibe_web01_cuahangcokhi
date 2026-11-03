@@ -22,6 +22,10 @@ Lần chạy đầu tự tạo CSDL `web/data/cuahang.db` kèm dữ liệu mẫu
 | `lan`, `hung` | `123456` | Nhân viên bán hàng |
 | `minh` | `123456` | Thủ kho |
 
+## Triển khai
+
+Bản demo chạy trên **Render**, theo cấu hình [render.yaml](render.yaml). Mỗi lần push lên `main`, Render tự triển khai lại. Dữ liệu quay về bộ mẫu khi máy chủ khởi động lại, xem [docs/kien-truc.md](docs/kien-truc.md) mục 7.
+
 ## Tài liệu
 
 | Tài liệu | Nội dung |

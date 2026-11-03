@@ -1,0 +1,14 @@
+# Cấu hình triển khai lên Render (Blueprint). Xem docs/kien-truc.md mục 7.
+services:
+  - type: web
+    name: vibe-web01-cuahangcokhi
+    runtime: node
+    plan: free
+    rootDir: web
+    buildCommand: npm ci && npm run build
+    startCommand: npm run start
+    healthCheckPath: /login
+    envVars:
+      # node:sqlite có sẵn từ Node 22.13; dùng bản LTS 24
+      - key: NODE_VERSION
+        value: "24"

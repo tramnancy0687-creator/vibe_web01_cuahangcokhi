@@ -228,23 +228,33 @@ bt_usecase/
 - **Làm lại dữ liệu mẫu:** tắt server, xóa thư mục `data/`, chạy lại.
 - **Mở xem CSDL:** dùng extension SQLite Viewer trong VS Code.
 
-### Bản demo trên Vercel
+### Bản demo trên Render
 
-Repo GitHub được nối với Vercel (Root Directory = `web`). Mỗi lần `git push` lên `main`, Vercel tự build và triển khai lại.
+Cấu hình nằm ở file `render.yaml` ở thư mục gốc repo (Render Blueprint). Repo GitHub được nối với Render, và mỗi lần `git push` lên `main`, Render tự build và triển khai lại.
 
-- **Chỗ đặt CSDL:** trên Vercel chỉ thư mục `/tmp` ghi được. `db.ts` tự chọn `/tmp/cuahang.db` khi có biến môi trường `VERCEL`. Có thể ghi đè bằng biến `DB_PATH`.
-- **Hệ quả:**
-  - `/tmp` bị xóa khi máy chủ khởi động lại (sau một thời gian không ai dùng, hoặc mỗi lần deploy). Khi đó CSDL được tạo lại kèm **dữ liệu mẫu**, và mọi thay đổi trước đó mất.
-  - Nếu Vercel chạy nhiều máy chủ cùng lúc, mỗi máy có CSDL riêng. Người dùng có thể thấy số liệu khác nhau, hoặc bị đăng xuất.
+| Mục | Giá trị |
+|---|---|
+| Loại dịch vụ | Web Service, Node, gói Free |
+| Thư mục gốc | `web` |
+| Build | `npm ci && npm run build` |
+| Start | `npm run start` (Next.js tự nghe cổng ở biến `PORT` mà Render cấp) |
+| Kiểm tra sống | `/login` |
+| Node | `NODE_VERSION=24`, cần ≥ 22.13 để có `node:sqlite`. `package.json` cũng khai báo `engines.node` |
+
+**Về dữ liệu:**
+- Render chạy **một máy chủ liên tục**, nên CSDL `web/data/cuahang.db` dùng chung cho mọi người trong lúc máy chủ chạy, và phiên đăng nhập ổn định.
+- Ổ đĩa gói Free là tạm thời. Khi máy chủ khởi động lại (mỗi lần deploy, hoặc khi "ngủ" sau 15 phút không ai dùng), CSDL được tạo lại kèm **dữ liệu mẫu**, mọi thay đổi trước đó mất.
+- Lần mở đầu tiên sau khi máy chủ ngủ phải chờ khoảng 30–50 giây.
 - **Phạm vi dùng:** bản này chỉ dùng để **xem thử và chấm bài**, không dùng cho cửa hàng thật.
-- **Phiên bản Node:** `package.json` khai báo `engines.node >= 22.13` để Vercel chọn Node có sẵn `node:sqlite`.
+
+**Vercel:** `db.ts` vẫn hỗ trợ chạy trên Vercel. Khi có biến `VERCEL`, CSDL đặt ở `/tmp/cuahang.db`. Tuy vậy, Vercel chạy theo kiểu serverless, có thể dùng nhiều máy chủ cùng lúc, mỗi máy một CSDL riêng, nên không hợp với SQLite bằng Render. Có thể ghi đè chỗ đặt CSDL bằng biến `DB_PATH`.
 
 ### Giới hạn và hướng mở rộng
 
 | Giới hạn hiện tại | Khi cần mở rộng |
 |---|---|
 | SQLite chỉ một máy chủ ghi; đủ cho vài chục người dùng cùng lúc | Chuyển sang PostgreSQL: chỉ thay `lib/db.ts` và cú pháp SQL, tầng nghiệp vụ giữ nguyên |
-| Bản Vercel mất dữ liệu khi máy chủ khởi động lại | Dùng CSDL lưu trữ ngoài (Turso cho SQLite, hoặc Vercel Postgres). Driver ngoài là bất đồng bộ, nên phải đổi các hàm `lib/` sang `async` |
+| Bản demo trên Render mất dữ liệu khi máy chủ khởi động lại | Gắn ổ đĩa lâu dài (Render Persistent Disk, gói trả phí) rồi đặt `DB_PATH` vào ổ đó; hoặc dùng CSDL ngoài (Turso, Postgres). Driver ngoài là bất đồng bộ, nên phải đổi các hàm `lib/` sang `async` |
 | Chưa có nút xuất Excel cho báo cáo (có trong wireframe) | Thêm route trả file CSV trong `bao-cao/` |
 | Chưa in hóa đơn | Thêm trang in phiếu bán dùng CSS `@media print` |
 | Giá vốn tạm theo FIFO | Chờ khách chốt, sửa `consumeFIFO` |
