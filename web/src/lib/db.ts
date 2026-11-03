@@ -6,7 +6,9 @@ import { seed } from "./seed";
 
 type Param = string | number | bigint | null;
 
-const DB_PATH = process.env.DB_PATH ?? path.join(process.cwd(), "data", "cuahang.db");
+// Trên Vercel chỉ /tmp ghi được, và bị xóa khi máy chủ khởi động lại: bản demo tự nạp lại dữ liệu mẫu
+const DB_PATH = process.env.DB_PATH
+  ?? (process.env.VERCEL ? "/tmp/cuahang.db" : path.join(process.cwd(), "data", "cuahang.db"));
 
 // Giữ một kết nối duy nhất, kể cả khi dev server hot-reload
 const g = globalThis as unknown as { __cuahangDb?: DatabaseSync };

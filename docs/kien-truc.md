@@ -228,11 +228,23 @@ bt_usecase/
 - **Làm lại dữ liệu mẫu:** tắt server, xóa thư mục `data/`, chạy lại.
 - **Mở xem CSDL:** dùng extension SQLite Viewer trong VS Code.
 
+### Bản demo trên Vercel
+
+Repo GitHub được nối với Vercel (Root Directory = `web`). Mỗi lần `git push` lên `main`, Vercel tự build và triển khai lại.
+
+- **Chỗ đặt CSDL:** trên Vercel chỉ thư mục `/tmp` ghi được. `db.ts` tự chọn `/tmp/cuahang.db` khi có biến môi trường `VERCEL`. Có thể ghi đè bằng biến `DB_PATH`.
+- **Hệ quả:**
+  - `/tmp` bị xóa khi máy chủ khởi động lại (sau một thời gian không ai dùng, hoặc mỗi lần deploy). Khi đó CSDL được tạo lại kèm **dữ liệu mẫu**, và mọi thay đổi trước đó mất.
+  - Nếu Vercel chạy nhiều máy chủ cùng lúc, mỗi máy có CSDL riêng. Người dùng có thể thấy số liệu khác nhau, hoặc bị đăng xuất.
+- **Phạm vi dùng:** bản này chỉ dùng để **xem thử và chấm bài**, không dùng cho cửa hàng thật.
+- **Phiên bản Node:** `package.json` khai báo `engines.node >= 22.13` để Vercel chọn Node có sẵn `node:sqlite`.
+
 ### Giới hạn và hướng mở rộng
 
 | Giới hạn hiện tại | Khi cần mở rộng |
 |---|---|
 | SQLite chỉ một máy chủ ghi; đủ cho vài chục người dùng cùng lúc | Chuyển sang PostgreSQL: chỉ thay `lib/db.ts` và cú pháp SQL, tầng nghiệp vụ giữ nguyên |
+| Bản Vercel mất dữ liệu khi máy chủ khởi động lại | Dùng CSDL lưu trữ ngoài (Turso cho SQLite, hoặc Vercel Postgres). Driver ngoài là bất đồng bộ, nên phải đổi các hàm `lib/` sang `async` |
 | Chưa có nút xuất Excel cho báo cáo (có trong wireframe) | Thêm route trả file CSV trong `bao-cao/` |
 | Chưa in hóa đơn | Thêm trang in phiếu bán dùng CSS `@media print` |
 | Giá vốn tạm theo FIFO | Chờ khách chốt, sửa `consumeFIFO` |
